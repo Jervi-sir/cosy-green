@@ -1,16 +1,17 @@
 import { ReactNode } from 'react';
-import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
+import { StyleProp, StyleSheet, Text, TextInput, TextInputProps, View, ViewStyle } from 'react-native';
 
 import { colors, radius } from '../../theme';
 
 type AppTextFieldProps = TextInputProps & {
   leading?: ReactNode;
   rtl?: boolean;
+  containerStyle?: StyleProp<ViewStyle>;
 };
 
-export function AppTextField({ leading, rtl = false, style, ...props }: AppTextFieldProps) {
+export function AppTextField({ leading, rtl = false, style, containerStyle, ...props }: AppTextFieldProps) {
   return (
-    <View style={styles.shell}>
+    <View style={[styles.shell, containerStyle]}>
       {leading ? <View style={styles.leading}>{leading}</View> : null}
       <TextInput
         placeholderTextColor="#A6A6A6"
@@ -48,7 +49,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   leading: {
-    marginRight: 12,
+    marginEnd: 12,
   },
   badge: {
     width: 30,

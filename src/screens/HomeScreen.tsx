@@ -1,285 +1,368 @@
-import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
-import { ScreenShell } from '../components/ScreenShell';
-import { SectionHeader } from '../components/SectionHeader';
-import { quickActions, requests, schedule } from '../data/mockData';
-import { RootStackParamList } from '../navigation/AppNavigator';
-import { colors, radius, shadow } from '../theme';
+import { AppHeaderBar } from '../components/ui/AppHeaderBar';
+import { BottomActionDock } from '../components/ui/BottomActionDock';
+import { colors, shadow } from '../theme';
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+const mapPins = [
+  { left: 36, top: 78, color: '#59A6E2' },
+  { left: 112, top: 40, color: '#59A6E2' },
+  { left: 174, top: 64, color: '#F1A52D' },
+  { left: 242, top: 44, color: '#59A6E2' },
+  { left: 24, top: 136, color: '#E73C35' },
+  { left: 88, top: 116, color: '#E73C35' },
+  { left: 152, top: 132, color: '#E73C35' },
+  { left: 214, top: 120, color: '#E73C35' },
+  { left: 262, top: 154, color: '#59A6E2' },
+  { left: 54, top: 220, color: '#59A6E2' },
+  { left: 110, top: 188, color: '#59A6E2' },
+  { left: 190, top: 196, color: '#E73C35' },
+  { left: 236, top: 218, color: '#E73C35' },
+  { left: 44, top: 290, color: '#59A6E2' },
+  { left: 102, top: 276, color: '#59A6E2' },
+  { left: 162, top: 254, color: '#21B54A' },
+  { left: 230, top: 278, color: '#E73C35' },
+  { left: 272, top: 240, color: '#21B54A' },
+] as const;
+
+const bottomActions: Array<{
+  key: string;
+  icon: 'truck-fast' | 'message-outline' | 'home' | 'bag-personal' | 'phone-outline';
+  active?: boolean;
+}> = [
+  { key: 'truck', icon: 'truck-fast', active: true },
+  { key: 'message', icon: 'message-outline' },
+  { key: 'home', icon: 'home' },
+  { key: 'bag', icon: 'bag-personal' },
+  { key: 'phone', icon: 'phone-outline' },
+];
 
 export function HomeScreen() {
-  const navigation = useNavigation<NavigationProp>();
-  const activeRequest = requests[0];
-
   return (
-    <ScreenShell>
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>Good evening</Text>
-          <Text style={styles.name}>Rania, your block is 92% clear today.</Text>
-        </View>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>RA</Text>
-        </View>
-      </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <AppHeaderBar title="السائق" />
 
-      <LinearGradient colors={['#199B56', '#29BE77']} style={styles.heroCard}>
-        <View style={styles.heroTopRow}>
-          <View>
-            <Text style={styles.heroLabel}>Active municipal case</Text>
-            <Text style={styles.heroTitle}>{activeRequest.title}</Text>
-          </View>
-          <View style={styles.heroBadge}>
-            <Ionicons name="navigate" size={16} color={colors.primaryDeep} />
-            <Text style={styles.heroBadgeText}>{activeRequest.eta}</Text>
-          </View>
-        </View>
-
-        <View style={styles.progressTrack}>
-          <View style={[styles.progressFill, { width: `${activeRequest.progress * 100}%` }]} />
-        </View>
-
-        <View style={styles.heroStats}>
-          <View>
-            <Text style={styles.heroStatLabel}>Status</Text>
-            <Text style={styles.heroStatValue}>{activeRequest.status}</Text>
-          </View>
-          <View>
-            <Text style={styles.heroStatLabel}>Address</Text>
-            <Text style={styles.heroStatValue}>{activeRequest.address}</Text>
-          </View>
-        </View>
-
-        <Pressable style={styles.heroButton} onPress={() => navigation.navigate('RequestDetails')}>
-          <Text style={styles.heroButtonText}>Open live tracking</Text>
-          <Ionicons name="arrow-forward" size={18} color={colors.primaryDeep} />
-        </Pressable>
-      </LinearGradient>
-
-      <View style={styles.sectionGap}>
-        <SectionHeader eyebrow="Services" title="Quick actions" />
-      </View>
-      <View style={styles.actionGrid}>
-        {quickActions.map((action) => (
-          <Pressable key={action.id} style={styles.actionCard}>
-            <View style={styles.actionIconWrap}>
-              <Ionicons name={action.icon as keyof typeof Ionicons.glyphMap} size={20} color={colors.primaryDeep} />
+        <View style={styles.content}>
+          <View style={styles.profileRow}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>D</Text>
             </View>
-            <Text style={styles.actionTitle}>{action.title}</Text>
-            <Text style={styles.actionSubtitle}>{action.subtitle}</Text>
-          </Pressable>
-        ))}
-      </View>
+            <Text style={styles.profileName}>D.mohamed</Text>
+          </View>
 
-      <View style={styles.sectionGap}>
-        <SectionHeader eyebrow="Calendar" title="This week's routes" action="Municipality" />
-      </View>
-      {schedule.map((item) => (
-        <View key={item.day} style={styles.scheduleCard}>
-          <View style={[styles.dayPill, { backgroundColor: item.tone }]}>
-            <Text style={styles.dayText}>{item.day}</Text>
+          <View style={styles.mapCard}>
+            <View style={[styles.road, styles.roadA]} />
+            <View style={[styles.road, styles.roadB]} />
+            <View style={[styles.road, styles.roadC]} />
+            <View style={[styles.road, styles.roadD]} />
+            <View style={[styles.road, styles.roadE]} />
+            <View style={[styles.road, styles.roadF]} />
+
+            <View style={styles.blockA} />
+            <View style={styles.blockB} />
+            <View style={styles.blockC} />
+            <View style={styles.blockD} />
+            <View style={styles.blockE} />
+            <View style={styles.blockF} />
+            <View style={styles.blockG} />
+            <View style={styles.blockH} />
+            <View style={styles.blockI} />
+            <View style={styles.blockJ} />
+            <View style={styles.roundabout} />
+            <View style={styles.park} />
+
+            {mapPins.map((pin, index) => (
+              <View key={`${pin.left}-${pin.top}-${index}`} style={[styles.pinWrap, { left: pin.left, top: pin.top }]}>
+                <Ionicons name="location-sharp" size={12} color={pin.color} />
+              </View>
+            ))}
+
+            <View style={styles.driverMarker}>
+              <MaterialCommunityIcons name="truck-fast" size={16} color="#1EB54A" />
+            </View>
+
+            <Text style={[styles.mapLabel, styles.labelA]}>Vulcanisation Auto</Text>
+            <Text style={[styles.mapLabel, styles.labelB]}>Primo snack</Text>
+            <Text style={[styles.mapLabel, styles.labelC]}>L'EURL MAISON DECO</Text>
+            <Text style={[styles.mapLabel, styles.labelD]}>Cosmétique makhlouf</Text>
           </View>
-          <View style={styles.scheduleCopy}>
-            <Text style={styles.scheduleTitle}>{item.title}</Text>
-            <Text style={styles.scheduleTime}>{item.time}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={colors.muted} />
         </View>
-      ))}
-    </ScreenShell>
+
+        <View style={styles.bottomLeftCircle} />
+        <View style={styles.bottomRightCircle} />
+
+        <BottomActionDock items={[...bottomActions]} />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.white,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: colors.white,
+    overflow: 'hidden',
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 10,
+    paddingTop: 14,
+  },
+  profileRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 12,
-    marginBottom: 26,
-  },
-  greeting: {
-    color: colors.primaryDeep,
-    fontSize: 13,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 6,
-  },
-  name: {
-    color: colors.ink,
-    fontSize: 28,
-    lineHeight: 34,
-    fontWeight: '900',
-    maxWidth: 270,
+    marginBottom: 12,
+    paddingHorizontal: 18,
   },
   avatar: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: colors.primaryDeep,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#53413C',
     alignItems: 'center',
     justifyContent: 'center',
+    marginRight: 8,
+    ...shadow.card,
   },
   avatarText: {
     color: colors.white,
-    fontSize: 16,
-    fontWeight: '800',
-  },
-  heroCard: {
-    borderRadius: radius.xl,
-    padding: 22,
-    ...shadow.card,
-  },
-  heroTopRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 16,
-    marginBottom: 22,
-  },
-  heroLabel: {
-    color: 'rgba(255,255,255,0.82)',
     fontSize: 13,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  heroTitle: {
-    color: colors.white,
-    fontSize: 26,
-    lineHeight: 30,
     fontWeight: '900',
-    maxWidth: 180,
   },
-  heroBadge: {
-    backgroundColor: colors.white,
-    alignSelf: 'flex-start',
-    flexDirection: 'row',
-    gap: 6,
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: radius.pill,
-  },
-  heroBadgeText: {
-    color: colors.primaryDeep,
+  profileName: {
+    color: '#333333',
     fontSize: 12,
     fontWeight: '800',
   },
-  progressTrack: {
-    height: 10,
-    backgroundColor: 'rgba(255,255,255,0.24)',
-    borderRadius: radius.pill,
+  mapCard: {
+    height: 362,
+    borderWidth: 1,
+    borderColor: '#8A8A8A',
+    backgroundColor: '#D0C5B8',
     overflow: 'hidden',
-    marginBottom: 18,
+    position: 'relative',
   },
-  progressFill: {
-    height: '100%',
-    backgroundColor: colors.white,
-    borderRadius: radius.pill,
+  road: {
+    position: 'absolute',
+    backgroundColor: '#B0A89E',
+    borderColor: '#EEE8DE',
+    borderWidth: 2,
   },
-  heroStats: {
-    gap: 16,
-    marginBottom: 20,
+  roadA: {
+    width: 350,
+    height: 38,
+    top: 42,
+    left: -18,
+    transform: [{ rotate: '18deg' }],
   },
-  heroStatLabel: {
-    color: 'rgba(255,255,255,0.75)',
-    fontSize: 12,
-    marginBottom: 4,
+  roadB: {
+    width: 340,
+    height: 36,
+    top: 108,
+    left: -20,
+    transform: [{ rotate: '-12deg' }],
   },
-  heroStatValue: {
-    color: colors.white,
-    fontSize: 15,
-    fontWeight: '700',
+  roadC: {
+    width: 320,
+    height: 36,
+    top: 180,
+    left: -14,
+    transform: [{ rotate: '30deg' }],
   },
-  heroButton: {
-    minHeight: 52,
-    borderRadius: radius.pill,
-    backgroundColor: colors.white,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
+  roadD: {
+    width: 36,
+    height: 390,
+    top: -16,
+    left: 140,
+    transform: [{ rotate: '4deg' }],
   },
-  heroButtonText: {
-    color: colors.primaryDeep,
-    fontSize: 15,
-    fontWeight: '800',
+  roadE: {
+    width: 34,
+    height: 300,
+    top: 18,
+    left: 220,
+    transform: [{ rotate: '-12deg' }],
   },
-  sectionGap: {
-    marginTop: 30,
-    marginBottom: 16,
+  roadF: {
+    width: 240,
+    height: 30,
+    top: 246,
+    left: 70,
+    transform: [{ rotate: '-22deg' }],
   },
-  actionGrid: {
-    gap: 14,
+  blockA: {
+    position: 'absolute',
+    top: 22,
+    left: 16,
+    width: 76,
+    height: 44,
+    backgroundColor: '#C6BBB0',
+    transform: [{ rotate: '12deg' }],
   },
-  actionCard: {
-    backgroundColor: colors.white,
-    borderRadius: radius.lg,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: colors.line,
-    ...shadow.card,
+  blockB: {
+    position: 'absolute',
+    top: 18,
+    left: 188,
+    width: 88,
+    height: 58,
+    backgroundColor: '#C3B6AA',
+    transform: [{ rotate: '-11deg' }],
   },
-  actionIconWrap: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: colors.surfaceStrong,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 14,
+  blockC: {
+    position: 'absolute',
+    top: 92,
+    left: 72,
+    width: 54,
+    height: 48,
+    backgroundColor: '#C9BEB1',
+    transform: [{ rotate: '8deg' }],
   },
-  actionTitle: {
-    color: colors.ink,
-    fontSize: 17,
-    fontWeight: '800',
-    marginBottom: 6,
+  blockD: {
+    position: 'absolute',
+    top: 106,
+    right: 22,
+    width: 78,
+    height: 54,
+    backgroundColor: '#C4B7AB',
+    transform: [{ rotate: '10deg' }],
   },
-  actionSubtitle: {
-    color: colors.text,
-    fontSize: 14,
-    lineHeight: 20,
-    maxWidth: 260,
+  blockE: {
+    position: 'absolute',
+    top: 172,
+    left: 18,
+    width: 70,
+    height: 48,
+    backgroundColor: '#C8BCAF',
+    transform: [{ rotate: '6deg' }],
   },
-  scheduleCard: {
+  blockF: {
+    position: 'absolute',
+    top: 174,
+    left: 180,
+    width: 66,
+    height: 58,
+    backgroundColor: '#C5B8AB',
+    transform: [{ rotate: '-10deg' }],
+  },
+  blockG: {
+    position: 'absolute',
+    bottom: 90,
+    left: 44,
+    width: 72,
+    height: 50,
+    backgroundColor: '#C5B9AE',
+    transform: [{ rotate: '-14deg' }],
+  },
+  blockH: {
+    position: 'absolute',
+    bottom: 78,
+    left: 190,
+    width: 96,
+    height: 58,
+    backgroundColor: '#C4B7AB',
+    transform: [{ rotate: '8deg' }],
+  },
+  blockI: {
+    position: 'absolute',
+    bottom: 24,
+    left: 20,
+    width: 94,
+    height: 40,
+    backgroundColor: '#C7BBAD',
+    transform: [{ rotate: '2deg' }],
+  },
+  blockJ: {
+    position: 'absolute',
+    bottom: 24,
+    right: 18,
+    width: 86,
+    height: 44,
+    backgroundColor: '#C6BBAD',
+    transform: [{ rotate: '-6deg' }],
+  },
+  roundabout: {
+    position: 'absolute',
+    top: 86,
+    left: 132,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#B7AEA2',
+    borderWidth: 2,
+    borderColor: '#E7E0D6',
+  },
+  park: {
+    position: 'absolute',
+    left: 14,
+    bottom: 106,
+    width: 38,
+    height: 34,
+    backgroundColor: '#86AA79',
+    borderRadius: 3,
+  },
+  pinWrap: {
+    position: 'absolute',
+  },
+  driverMarker: {
+    position: 'absolute',
+    left: 76,
+    bottom: 56,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     backgroundColor: 'rgba(255,255,255,0.8)',
-    borderRadius: radius.lg,
-    padding: 16,
-    flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
-    borderWidth: 1,
-    borderColor: colors.line,
-    marginBottom: 12,
+    justifyContent: 'center',
   },
-  dayPill: {
-    minWidth: 58,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderRadius: radius.md,
-    alignItems: 'center',
+  mapLabel: {
+    position: 'absolute',
+    color: '#444444',
+    fontSize: 7,
+    fontWeight: '700',
+    backgroundColor: 'rgba(255,255,255,0.4)',
+    paddingHorizontal: 2,
+    paddingVertical: 1,
+    borderRadius: 2,
   },
-  dayText: {
-    color: colors.ink,
-    fontSize: 14,
-    fontWeight: '800',
+  labelA: {
+    top: 28,
+    right: 28,
   },
-  scheduleCopy: {
-    flex: 1,
+  labelB: {
+    top: 88,
+    right: 42,
   },
-  scheduleTitle: {
-    color: colors.ink,
-    fontSize: 15,
-    fontWeight: '800',
-    marginBottom: 4,
+  labelC: {
+    bottom: 92,
+    right: 28,
   },
-  scheduleTime: {
-    color: colors.muted,
-    fontSize: 13,
+  labelD: {
+    bottom: 34,
+    right: 18,
+  },
+  bottomLeftCircle: {
+    position: 'absolute',
+    left: -36,
+    bottom: 18,
+    width: 118,
+    height: 118,
+    borderRadius: 59,
+    backgroundColor: '#A6EDC0',
+    zIndex: -1,
+  },
+  bottomRightCircle: {
+    position: 'absolute',
+    right: -30,
+    bottom: 94,
+    width: 92,
+    height: 92,
+    borderRadius: 46,
+    backgroundColor: '#2BD793',
   },
 });
