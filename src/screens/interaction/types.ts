@@ -29,6 +29,14 @@ export type TrashSignal = {
   acceptedAt?: string;
 };
 
+export type TruckProfile = {
+  name: string;
+  plateNumber: string;
+  zone: string;
+  pickedCount: number;
+  completedTrips: number;
+};
+
 export type RequestState = {
   appRole: AppRole;
   subscriptionType: SubscriptionType;
@@ -42,6 +50,7 @@ export type RequestState = {
   truckStep: number;
   truckEta: string;
   points: number;
+  truckProfile: TruckProfile;
 };
 
 export type AppFlowContextValue = {
@@ -55,6 +64,9 @@ export type AppFlowContextValue = {
   selectTruckSignal: (id: string) => void;
   confirmTruckSignal: (id: string) => void;
   moveTruck: () => void;
+  moveTruckBack: () => void;
   scanCurrentSignal: () => void;
+  simulateTruckScan: (id: string) => void;
+  scanSignalByQrCode: (qrCode: string) => boolean;
   resetApp: () => void;
 };

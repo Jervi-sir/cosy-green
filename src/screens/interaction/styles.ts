@@ -10,8 +10,8 @@ export const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 20,
-    paddingBottom: 120,
     gap: 18,
+    flexGrow: 1
   },
   loadingScreen: {
     flex: 1,

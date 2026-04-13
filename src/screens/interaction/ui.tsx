@@ -1,6 +1,7 @@
 import { type ReactNode } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors } from "../../theme";
 import { styles } from "./styles";
@@ -8,21 +9,40 @@ import { styles } from "./styles";
 export function ScreenShell({
   children,
   scroll = false,
+  includeTopSafeArea = true,
+  withPaddingBottom = true,
 }: {
   children: ReactNode;
   scroll?: boolean;
+  includeTopSafeArea?: boolean;
+  withPaddingBottom?: boolean;
 }) {
   if (scroll) {
     return (
-      <SafeAreaView style={styles.screen}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+      <SafeAreaView
+        style={styles.screen}
+        edges={includeTopSafeArea ? ["top"] : []}
+      >
+        <ScrollView
+          contentContainerStyle={[
+            styles.scrollContent,
+            withPaddingBottom && { paddingBottom: 120 },
+          ]}
+        >
           {children}
         </ScrollView>
       </SafeAreaView>
     );
   }
 
-  return <SafeAreaView style={styles.screen}>{children}</SafeAreaView>;
+  return (
+    <SafeAreaView
+      style={styles.screen}
+      edges={includeTopSafeArea ? ["top"] : []}
+    >
+      {children}
+    </SafeAreaView>
+  );
 }
 
 export function HeroHeader({
@@ -31,6 +51,7 @@ export function HeroHeader({
   backLabel,
   onBackPress,
   actionLabel,
+  actionIcon,
   onActionPress,
 }: {
   title: string;
@@ -38,10 +59,21 @@ export function HeroHeader({
   backLabel?: string;
   onBackPress?: () => void;
   actionLabel?: string;
+  actionIcon?: keyof typeof Ionicons.glyphMap;
   onActionPress?: () => void;
 }) {
   return (
     <View style={styles.headerWrap}>
+      {(actionLabel || actionIcon) && onActionPress ? (
+        <Pressable style={styles.headerAction} onPress={onActionPress}>
+          {actionIcon ? (
+            <Ionicons name={actionIcon} size={18} color={colors.primaryDeep} />
+          ) : null}
+          {actionLabel ? (
+            <Text style={styles.headerActionText}>{actionLabel}</Text>
+          ) : null}
+        </Pressable>
+      ) : null}
       {backLabel && onBackPress ? (
         <Pressable style={styles.headerAction} onPress={onBackPress}>
           <Text style={styles.headerActionText}>{backLabel}</Text>
@@ -51,11 +83,6 @@ export function HeroHeader({
         <Text style={[styles.headerTitle]}>{title}</Text>
         <Text style={styles.headerSubtitle}>{subtitle}</Text>
       </View>
-      {actionLabel && onActionPress ? (
-        <Pressable style={styles.headerAction} onPress={onActionPress}>
-          <Text style={styles.headerActionText}>{actionLabel}</Text>
-        </Pressable>
-      ) : null}
     </View>
   );
 }

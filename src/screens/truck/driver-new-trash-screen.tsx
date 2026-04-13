@@ -1,9 +1,9 @@
 import { useNavigation } from "@react-navigation/native";
 import { Text, Pressable, View } from "react-native";
 
-import { useAppFlow } from "./context";
-import { styles } from "./styles";
-import { HeroHeader, ScreenShell } from "./ui";
+import { useAppFlow } from "../interaction/context";
+import { styles } from "../interaction/styles";
+import { HeroHeader, ScreenShell } from "../interaction/ui";
 
 export function DriverNewTrashScreen() {
   const navigation = useNavigation<any>();

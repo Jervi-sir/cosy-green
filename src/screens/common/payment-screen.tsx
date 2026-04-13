@@ -1,10 +1,16 @@
 import { Text, View } from "react-native";
+import { CommonActions } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { type RootStackParamList } from "../../navigation/AppNavigator";
-import { useAppFlow } from "./context";
-import { styles } from "./styles";
-import { DetailRow, HeroHeader, PrimaryButton, ScreenShell } from "./ui";
+import { useAppFlow } from "../interaction/context";
+import { styles } from "../interaction/styles";
+import {
+  DetailRow,
+  HeroHeader,
+  PrimaryButton,
+  ScreenShell,
+} from "../interaction/ui";
 
 export function PaymentScreen({
   navigation,
@@ -38,7 +44,14 @@ export function PaymentScreen({
         </View>
         <PrimaryButton
           label="ادفع وادخل التطبيق"
-          onPress={() => navigation.replace("UserApp")}
+          onPress={() =>
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: "UserApp" }],
+              }),
+            )
+          }
         />
       </View>
     </ScreenShell>

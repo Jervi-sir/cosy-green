@@ -2,15 +2,15 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Pressable, Text, View } from "react-native";
 
 import { RootStackParamList } from "../../navigation/AppNavigator";
-import { useAppFlow } from "./context";
-import { styles } from "./styles";
-import { DetailRow, HeroHeader, ScreenShell } from "./ui";
+import { useAppFlow } from "../interaction/context";
+import { styles } from "../interaction/styles";
+import { DetailRow, HeroHeader, ScreenShell } from "../interaction/ui";
 
 export function UserTrashDetailsScreen({
   navigation,
   route,
 }: NativeStackScreenProps<RootStackParamList, "UserTrashDetails">) {
-  const { state, scanCurrentSignal } = useAppFlow();
+  const { state, simulateTruckScan } = useAppFlow();
   const signal = state.signals.find(
     (entry) => entry.id === route.params.signalId,
   );
@@ -32,7 +32,7 @@ export function UserTrashDetailsScreen({
     <ScreenShell scroll>
       <HeroHeader
         title={signal.id}
-        subtitle="افتح تفاصيل النفايات وأظهر رمز QR هذا للشاحنة عند وصولها."
+        subtitle="تابع حالة الطلب. يتم فتح رمز QR بعد تأكيد الشاحنة للاستلام."
         backLabel="رجوع"
         onBackPress={() => navigation.goBack()}
       />
@@ -56,7 +56,7 @@ export function UserTrashDetailsScreen({
         <DetailRow label="تاريخ الإنشاء" value={signal.createdAt} />
       </View>
 
-      {signal.status === "Arrived" || signal.status === "Picked" ? (
+      {signal.acceptedByTruck || signal.status === "Picked" ? (
         <View style={styles.qrCard}>
           <Text style={styles.qrTitle}>
             {signal.status === "Picked"
@@ -66,19 +66,21 @@ export function UserTrashDetailsScreen({
           <Text style={styles.qrSubtitle}>
             {signal.status === "Picked"
               ? `تم تأكيد الاستلام${signal.scannedAt ? ` - ${signal.scannedAt}` : ""}`
-              : "يمكن للشاحنة مسح هذا الرمز لتأكيد الاستلام."}
+              : signal.status === "Arrived"
+                ? "وصلت الشاحنة. اعرض هذا الرمز ليتم المسح وتأكيد الاستلام."
+                : "أكدت الشاحنة الطلب. احتفظ بهذا الرمز جاهزاً حتى تصل إليك."}
           </Text>
           <FakeQr value={signal.qrCode} />
           <Text style={styles.qrCodeText}>{signal.qrCode}</Text>
-          {signal.status === "Arrived" ? (
+          {signal.status !== "Picked" ? (
             <Pressable
               style={styles.primaryButton}
               onPress={() => {
-                scanCurrentSignal();
+                simulateTruckScan(signal.id);
                 navigation.goBack();
               }}
             >
-              <Text style={styles.primaryButtonText}>تحديد كممسوح ومستلم</Text>
+              <Text style={styles.primaryButtonText}>محاكاة مسح الرمز</Text>
             </Pressable>
           ) : null}
         </View>

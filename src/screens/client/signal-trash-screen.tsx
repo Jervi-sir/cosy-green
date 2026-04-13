@@ -4,15 +4,15 @@ import { useNavigation } from "@react-navigation/native";
 import { Text, Pressable, View } from "react-native";
 
 import { UserTabParamList } from "../../navigation/AppNavigator";
-import { useAppFlow } from "./context";
-import { styles } from "./styles";
-import { HeroHeader, ScreenShell } from "./ui";
+import { useAppFlow } from "../interaction/context";
+import { styles } from "../interaction/styles";
+import { HeroHeader, ScreenShell } from "../interaction/ui";
 
 type Props = BottomTabScreenProps<UserTabParamList, "Signal">;
 
 export function SignalTrashScreen({ navigation }: Props) {
   const rootNavigation = useNavigation<any>();
-  const { state, resetApp } = useAppFlow();
+  const { state } = useAppFlow();
 
   return (
     <ScreenShell scroll>
@@ -80,11 +80,18 @@ export function SignalTrashScreen({ navigation }: Props) {
               <Text style={styles.signalText}>
                 المحتوى: {signal.wasteTypes.join(", ")}
               </Text>
-              <Text style={styles.signalText}>ملاحظة: {signal.note}</Text>
-              <Text style={styles.signalText}>الموقع: {signal.address}</Text>
-            </Pressable>
-          ))
-        )}
+               <Text style={styles.signalText}>ملاحظة: {signal.note}</Text>
+               <Text style={styles.signalText}>الموقع: {signal.address}</Text>
+               <Text style={styles.signalText}>
+                 {signal.status === "Picked"
+                   ? "تم تسجيل الاستلام وإضافة النقاط إلى حسابك"
+                   : signal.acceptedByTruck
+                     ? "أكدت الشاحنة هذا الطلب وتم فتح رمز QR"
+                     : "بانتظار أن تؤكد الشاحنة مرورها بهذا الطلب"}
+               </Text>
+             </Pressable>
+           ))
+         )}
       </View>
     </ScreenShell>
   );

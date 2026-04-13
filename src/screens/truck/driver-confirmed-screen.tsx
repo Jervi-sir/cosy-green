@@ -1,9 +1,9 @@
 import { useNavigation } from "@react-navigation/native";
 import { Text, Pressable, View } from "react-native";
 
-import { useAppFlow } from "./context";
-import { styles } from "./styles";
-import { HeroHeader, ScreenShell } from "./ui";
+import { useAppFlow } from "../interaction/context";
+import { styles } from "../interaction/styles";
+import { HeroHeader, ScreenShell } from "../interaction/ui";
 
 export function DriverConfirmedScreen() {
   const navigation = useNavigation<any>();
@@ -17,6 +17,21 @@ export function DriverConfirmedScreen() {
       <HeroHeader
         title="النفايات المؤكدة"
         subtitle="تم تأكيد استلام النفايات من قبل هذه الشاحنة."
+        actionIcon="camera-outline"
+        onActionPress={() => {
+          const arrivedSignal = confirmedSignals.find(
+            (signal) => signal.status === "Arrived",
+          );
+
+          if (!arrivedSignal) {
+            return;
+          }
+
+          selectTruckSignal(arrivedSignal.id);
+          navigation.navigate("TruckQrScanner", {
+            signalId: arrivedSignal.id,
+          });
+        }}
       />
 
       <View style={styles.listColumn}>
@@ -67,6 +82,21 @@ export function DriverConfirmedScreen() {
                 النفايات: {signal.wasteTypes.join(", ")}
               </Text>
               <Text style={styles.signalText}>الموقع: {signal.address}</Text>
+              {signal.status === "Arrived" ? (
+                <Pressable
+                  style={[styles.primaryButton, { marginTop: 8 }]}
+                  onPress={() => {
+                    selectTruckSignal(signal.id);
+                    navigation.navigate("TruckQrScanner", {
+                      signalId: signal.id,
+                    });
+                  }}
+                >
+                  <Text style={styles.primaryButtonText}>
+                    فتح الكاميرا لمسح QR
+                  </Text>
+                </Pressable>
+              ) : null}
             </Pressable>
           ))
         )}

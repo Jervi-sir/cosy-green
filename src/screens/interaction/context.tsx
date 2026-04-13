@@ -16,6 +16,30 @@ export function useAppFlow() {
 export function ConceptProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<RequestState>(initialState);
 
+  const buildPickedState = (
+    current: RequestState,
+    signalId: string,
+  ): RequestState => ({
+    ...current,
+    selectedTruckSignalId: signalId,
+    points: current.points + 35,
+    truckEta: 'تم تأكيد الاستلام',
+    truckProfile: {
+      ...current.truckProfile,
+      pickedCount: current.truckProfile.pickedCount + 1,
+      completedTrips: current.truckProfile.completedTrips + 1,
+    },
+    signals: current.signals.map((signal) =>
+      signal.id === signalId
+        ? {
+            ...signal,
+            status: 'Picked',
+            scannedAt: 'تم المسح للتو',
+          }
+        : signal,
+    ),
+  });
+
   const value = useMemo<AppFlowContextValue>(
     () => ({
       state,
@@ -58,6 +82,7 @@ export function ConceptProvider({ children }: { children: ReactNode }) {
               ? {
                   ...signal,
                   acceptedByTruck: true,
+                  status: signal.status === 'Picked' ? 'Picked' : 'On the way',
                   acceptedAt: 'تم التأكيد للتو',
                 }
               : signal,
@@ -67,19 +92,39 @@ export function ConceptProvider({ children }: { children: ReactNode }) {
         setState((current) => {
           const nextStep = Math.min(current.truckStep + 1, truckRoute.length - 1);
           const nextStatus = nextStep >= truckRoute.length - 1 ? 'Arrived' : 'On the way';
-          const activeSignalId = current.selectedTruckSignalId ?? current.signals[0]?.id;
+          const activeSignalId =
+            current.selectedTruckSignalId ?? current.signals.find((signal) => signal.acceptedByTruck)?.id;
           return {
             ...current,
             signals: current.signals.map((signal, index) =>
-              signal.id === activeSignalId || (!activeSignalId && index === 0)
+              (signal.id === activeSignalId || (!activeSignalId && index === 0)) && signal.acceptedByTruck
                 ? {
                     ...signal,
-                    status: nextStatus,
+                    status: signal.status === 'Picked' ? 'Picked' : nextStatus,
                   }
                 : signal,
             ),
             truckStep: nextStep,
             truckEta: etaMap[nextStep],
+          };
+        }),
+      moveTruckBack: () =>
+        setState((current) => {
+          const previousStep = Math.max(current.truckStep - 1, 0);
+          const activeSignalId =
+            current.selectedTruckSignalId ?? current.signals.find((signal) => signal.acceptedByTruck)?.id;
+          return {
+            ...current,
+            signals: current.signals.map((signal, index) =>
+              (signal.id === activeSignalId || (!activeSignalId && index === 0)) && signal.acceptedByTruck
+                ? {
+                    ...signal,
+                    status: signal.status === 'Picked' ? 'Picked' : 'On the way',
+                  }
+                : signal,
+            ),
+            truckStep: previousStep,
+            truckEta: etaMap[previousStep],
           };
         }),
       resetApp: () =>
@@ -95,21 +140,27 @@ export function ConceptProvider({ children }: { children: ReactNode }) {
             return current;
           }
 
-          return {
-            ...current,
-            points: current.points + 35,
-            truckEta: 'تم تأكيد الاستلام',
-            signals: current.signals.map((signal, index) =>
-              signal.id === currentSignal.id || (!current.selectedTruckSignalId && index === 0)
-                ? {
-                    ...signal,
-                    status: 'Picked',
-                    scannedAt: 'تم المسح للتو',
-                  }
-                : signal,
-            ),
-          };
+          return buildPickedState(current, currentSignal.id);
         }),
+      simulateTruckScan: (id) =>
+        setState((current) => {
+          const targetSignal = current.signals.find((signal) => signal.id === id);
+          if (!targetSignal || !targetSignal.acceptedByTruck || targetSignal.status === 'Picked') {
+            return current;
+          }
+
+          return buildPickedState(current, id);
+        }),
+      scanSignalByQrCode: (qrCode) => {
+        const normalizedCode = qrCode.trim();
+        const targetSignal = state.signals.find((signal) => signal.qrCode === normalizedCode);
+        if (!targetSignal || !targetSignal.acceptedByTruck || targetSignal.status !== 'Arrived') {
+          return false;
+        }
+
+        setState((current) => buildPickedState(current, targetSignal.id));
+        return true;
+      },
     }),
     [state],
   );

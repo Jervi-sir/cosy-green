@@ -1,9 +1,9 @@
 import { useNavigation } from "@react-navigation/native";
 import { Pressable, Text, View } from "react-native";
 
-import { useAppFlow } from "./context";
-import { styles } from "./styles";
-import { DetailRow, HeroHeader, ScreenShell } from "./ui";
+import { useAppFlow } from "../interaction/context";
+import { styles } from "../interaction/styles";
+import { DetailRow, HeroHeader, ScreenShell } from "../interaction/ui";
 import { colors, radius } from "@/theme";
 import { LogoutButton } from "@/components/LogoutButton";
 
