@@ -2,7 +2,8 @@
   "extends": "../tsconfig.server.json",
   "compilerOptions": {
     "module": "ESNext",
-    "moduleResolution": "Bundler"
+    "moduleResolution": "Bundler",
+    "outDir": "dist"
   },
   "include": ["./**/*.ts"]
 }

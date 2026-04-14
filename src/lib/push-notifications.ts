@@ -18,8 +18,8 @@ let lastRegisteredToken: string | null = null;
 
 export async function registerDevicePushToken() {
   if (Platform.OS === "android") {
-    await Notifications.setNotificationChannelAsync("cost-green-default", {
-      name: "Cost Green Notifications",
+    await Notifications.setNotificationChannelAsync("cozy-green-default", {
+      name: "cozy Green Notifications",
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: "#0C4E2D",

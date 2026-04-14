@@ -1,4 +1,4 @@
-# Cost Green Monitoring Dashboard
+# cozy Green Monitoring Dashboard
 
 React dashboard for the internal Fastify monitoring APIs.
 
@@ -14,14 +14,14 @@ This README covers:
 Install dependencies:
 
 ```bash
-cd /Users/jervi/Desktop/cost-green/monitoring-dashboard
+cd /Users/jervi/Desktop/cozy-green/monitoring-dashboard
 npm install
 ```
 
 Run locally against the backend:
 
 ```bash
-VITE_MONITORING_API_URL=http://192.168.1.109:4000 npm run dev
+VITE_MONITORING_API_URL=http://192.168.1.109:6037 npm run dev
 ```
 
 Default Vite URL:
@@ -35,9 +35,9 @@ http://localhost:5174
 Build the static files:
 
 ```bash
-cd /var/www/cost-green/app/monitoring-dashboard
+cd /var/www/cozy-green/app/monitoring-dashboard
 npm install
-VITE_MONITORING_API_URL=https://api.yourdomain.com npm run build
+VITE_MONITORING_API_URL=https://cozy-green-api.jervi.dev npm run build
 ```
 
 This creates:
@@ -56,7 +56,7 @@ Create an `A` record in Namecheap:
 Example dashboard domain:
 
 ```text
-monitoring.yourdomain.com
+cozy-green-monitoring.jervi.dev
 ```
 
 ## Nginx Static Hosting
@@ -64,7 +64,7 @@ monitoring.yourdomain.com
 Create Nginx config:
 
 ```bash
-sudo nano /etc/nginx/sites-available/cost-green-monitoring
+sudo nano /etc/nginx/sites-available/cozy-green-monitoring.jervi.dev
 ```
 
 Example:
@@ -72,9 +72,9 @@ Example:
 ```nginx
 server {
     listen 80;
-    server_name monitoring.yourdomain.com;
+    server_name cozy-green-monitoring.jervi.dev;
 
-    root /var/www/cost-green/app/monitoring-dashboard/dist;
+    root /home/jervi/projects/cosy-green/monitoring-dashboard/dist;
     index index.html;
 
     location / {
@@ -86,7 +86,7 @@ server {
 Enable it:
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/cost-green-monitoring /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/cozy-green-monitoring.jervi.dev /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 ```
@@ -96,7 +96,7 @@ sudo systemctl reload nginx
 Issue certificate with Certbot:
 
 ```bash
-sudo certbot --nginx -d monitoring.yourdomain.com
+sudo certbot --nginx -d cozy-green-monitoring.jervi.dev
 ```
 
 ## Deploy Update Flow
@@ -104,11 +104,11 @@ sudo certbot --nginx -d monitoring.yourdomain.com
 When the dashboard changes:
 
 ```bash
-cd /var/www/cost-green/app
+cd /var/www/cozy-green/app
 git pull
 cd monitoring-dashboard
 npm install
-VITE_MONITORING_API_URL=https://api.yourdomain.com npm run build
+VITE_MONITORING_API_URL=https://cozy-green-api.jervi.dev npm run build
 sudo systemctl reload nginx
 ```
 

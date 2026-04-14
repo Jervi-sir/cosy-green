@@ -1,6 +1,6 @@
-# Cost Green Server
+# cozy Green Server
 
-Fastify backend for the Cost Green app.
+Fastify backend for the cozy Green app.
 
 This README focuses on:
 - local run
@@ -22,16 +22,16 @@ This README focuses on:
 1. Install dependencies:
 
 ```bash
-cd /Users/jervi/Desktop/cost-green/server
+cd /Users/jervi/Desktop/cozy-green/server
 npm install
 ```
 
 2. Create `.env` inside `server/` or make sure the process can read the root `.env` values:
 
 ```env
-PORT=4000
+PORT=6037
 HOST=0.0.0.0
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/cost_green
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/cozy_green
 JWT_SECRET=change-me-in-production
 ACCESS_TOKEN_TTL=1h
 REFRESH_TOKEN_DAYS=30
@@ -54,19 +54,18 @@ npm run dev
 Recommended layout on the server:
 
 ```bash
-/var/www/cost-green/
-  app/                  # React Native repo clone
+/home/jervi/projects/cosy-green/
+  monitoring-dashboard/ # React dashboard
   server/.env           # backend env
 ```
 
 Example clone:
 
 ```bash
-sudo mkdir -p /var/www/cost-green
-sudo chown -R $USER:$USER /var/www/cost-green
-cd /var/www/cost-green
-git clone <your-repo-url> app
-cd app/server
+sudo mkdir -p /home/jervi/projects/cosy-green
+cd /home/jervi/projects/cosy-green
+# git clone <your-repo-url> .
+cd server
 npm install
 ```
 
@@ -84,13 +83,13 @@ Create `server/ecosystem.config.cjs`:
 module.exports = {
   apps: [
     {
-      name: "cost-green-server",
-      cwd: "/var/www/cost-green/app/server",
-      script: "npm",
-      args: "run start",
+      name: "cozy-green-api.jervi.dev",
+      cwd: "/home/jervi/projects/cosy-green/server",
+      script: "dist/index.js",
+      interpreter: "/home/jervi/.nvm/versions/node/v24.11.1/bin/node",
       env: {
         NODE_ENV: "production",
-        PORT: 4000,
+        PORT: 6037,
         HOST: "127.0.0.1"
       }
     }
@@ -101,7 +100,7 @@ module.exports = {
 Start with PM2:
 
 ```bash
-cd /var/www/cost-green/app/server
+cd /home/jervi/projects/cosy-green/server
 pm2 start ecosystem.config.cjs
 pm2 save
 pm2 startup
@@ -111,9 +110,9 @@ Useful PM2 commands:
 
 ```bash
 pm2 status
-pm2 logs cost-green-server
-pm2 restart cost-green-server
-pm2 stop cost-green-server
+pm2 logs cozy-green-api.jervi.dev
+pm2 restart cozy-green-api.jervi.dev
+pm2 stop cozy-green-api.jervi.dev
 ```
 
 ## Namecheap DNS
@@ -130,7 +129,7 @@ In Namecheap Advanced DNS:
 Example backend domain:
 
 ```text
-api.yourdomain.com
+cozy-green-api.jervi.dev
 ```
 
 Wait for DNS propagation.
@@ -147,7 +146,7 @@ sudo apt install nginx -y
 Create site config:
 
 ```bash
-sudo nano /etc/nginx/sites-available/cost-green-server
+sudo nano /etc/nginx/sites-available/cozy-green-api.jervi.dev
 ```
 
 Example config:
@@ -155,12 +154,12 @@ Example config:
 ```nginx
 server {
     listen 80;
-    server_name api.yourdomain.com;
+    server_name cozy-green-api.jervi.dev;
 
     client_max_body_size 20M;
 
     location / {
-        proxy_pass http://127.0.0.1:4000;
+        proxy_pass http://127.0.0.1:6037;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -176,7 +175,7 @@ server {
 Enable it:
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/cost-green-server /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/cozy-green-api.jervi.dev /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 ```
@@ -192,7 +191,7 @@ sudo apt install certbot python3-certbot-nginx -y
 Issue certificate:
 
 ```bash
-sudo certbot --nginx -d api.yourdomain.com
+sudo certbot --nginx -d cozy-green-api.jervi.dev
 ```
 
 Test renewal:
@@ -206,12 +205,13 @@ sudo certbot renew --dry-run
 When you push backend changes:
 
 ```bash
-cd /var/www/cost-green/app
+cd /home/jervi/projects/cosy-green
 git pull
 cd server
 npm install
+npm run build
 npm run db:migrate
-pm2 restart cost-green-server
+pm2 restart cozy-green-api.jervi.dev
 ```
 
 ## Monitoring Module Endpoints
@@ -247,5 +247,5 @@ These should usually be protected before public exposure.
 - health check works:
 
 ```bash
-curl https://api.yourdomain.com/health
+curl https://cozy-green-api.jervi.dev/health
 ```

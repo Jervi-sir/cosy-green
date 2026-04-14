@@ -33,7 +33,7 @@ export async function sendPushToTokens(tokens: string[], payload: PushPayload) {
         to: token,
         sound: "default",
         priority: "high",
-        channelId: "cost-green-default",
+        channelId: "cozy-green-default",
         title: payload.title,
         body: payload.body,
         data: payload.data ?? {},

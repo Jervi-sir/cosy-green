@@ -1,6 +1,6 @@
 import type { MonitoringListResponse, MonitoringRequest, MonitoringStats } from "./types";
 
-const API_BASE_URL = import.meta.env.VITE_MONITORING_API_URL ?? "http://localhost:4000";
+const API_BASE_URL = import.meta.env.VITE_MONITORING_API_URL ?? "http://localhost:6037";
 
 export async function fetchMonitoringRequests(query: URLSearchParams) {
   const response = await fetch(`${API_BASE_URL}/internal/monitoring/requests?${query.toString()}`);

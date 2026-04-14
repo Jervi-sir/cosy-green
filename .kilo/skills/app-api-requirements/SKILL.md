@@ -1,6 +1,6 @@
 # App API Requirements Skill
 
-Use this skill when the user asks for backend/API planning, endpoint design, service contracts, or implementation requirements for the `cost-green` app.
+Use this skill when the user asks for backend/API planning, endpoint design, service contracts, or implementation requirements for the `cozy-green` app.
 
 ## Purpose
 

@@ -1,10 +1,11 @@
 {
-  "name": "cost-green-server",
+  "name": "cozy-green-server",
   "private": true,
   "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "tsx watch --tsconfig tsconfig.json index.ts",
+    "build": "tsc -p tsconfig.json",
     "start": "tsx --tsconfig tsconfig.json index.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "db:generate": "drizzle-kit generate --config drizzle.config.ts",

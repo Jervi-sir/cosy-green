@@ -1,12 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Platform } from "react-native";
 
-const API_URL = "http://192.168.1.109:4000";
-  // process.env.EXPO_PUBLIC_API_URL ||
-  // (Platform.OS === "android" ? "http://10.0.2.2:4000" : "http://127.0.0.1:4000");
+const API_URL = "https://cozy-green-api.jervi.dev";
 
-const ACCESS_TOKEN_KEY = "cost-green-access-token";
-const REFRESH_TOKEN_KEY = "cost-green-refresh-token";
+const ACCESS_TOKEN_KEY = "cozy-green-access-token";
+const REFRESH_TOKEN_KEY = "cozy-green-refresh-token";
 
 let accessToken: string | null = null;
 let refreshToken: string | null = null;

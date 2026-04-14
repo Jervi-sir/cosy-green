@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "cosy-green",
-    "slug": "cosy-green",
+    "name": "cozy-green",
+    "slug": "cozy-green",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -21,21 +21,22 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "052a7118-2e1e-4084-ba69-0228f7c24cf8"
-      }
     },
     "runtimeVersion": {
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/052a7118-2e1e-4084-ba69-0228f7c24cf8"
+      "url": "https://u.expo.dev/8c5635d9-e37d-4dc1-821d-394384180849"
     },
     "plugins": [
       [
@@ -43,7 +44,7 @@
         {
           "icon": "./assets/icon.png",
           "color": "#0C4E2D",
-          "defaultChannel": "cost-green-default"
+          "defaultChannel": "cozy-green-default"
         }
       ],
       [
@@ -55,6 +56,11 @@
           "barcodeScannerEnabled": true
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "8c5635d9-e37d-4dc1-821d-394384180849"
+      }
+    }
   }
 }
