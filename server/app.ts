@@ -4,7 +4,9 @@ import jwt from "@fastify/jwt";
 import sensible from "@fastify/sensible";
 
 import { env } from "./config/env";
+import { monitoringPlugin } from "./modules/monitoring";
 import { authRoutes } from "./routes/auth";
+import { debugPushRoutes } from "./routes/debug-push";
 import { deviceRoutes } from "./routes/devices";
 import { rewardRoutes } from "./routes/rewards";
 import { subscriptionRoutes } from "./routes/subscriptions";
@@ -18,10 +20,17 @@ export async function buildServer() {
   await app.register(cors, { origin: true, credentials: true });
   await app.register(sensible);
   await app.register(jwt, { secret: env.JWT_SECRET });
+  await app.register(monitoringPlugin, {
+    enabled: true,
+    maxPayloadSize: 16_384,
+    ignoredRoutes: ["/health", "/metrics", "/internal/monitoring"],
+    retentionDays: 30,
+  });
 
   app.get("/health", async () => ({ status: "ok" }));
 
   await app.register(authRoutes);
+  await app.register(debugPushRoutes);
   await app.register(deviceRoutes);
   await app.register(userRoutes);
   await app.register(subscriptionRoutes);

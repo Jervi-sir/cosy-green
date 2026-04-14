@@ -152,3 +152,5 @@ export const truckLocationPings = pgTable("truck_location_pings", {
   recordedAt: timestamp("recorded_at", { withTimezone: true }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+export { monitoringRequests } from "../modules/monitoring/monitoring.schema";

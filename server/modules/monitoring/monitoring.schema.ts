@@ -1,0 +1,45 @@
+import {
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
+
+export const monitoringRequests = pgTable(
+  "monitoring_requests",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    requestId: varchar("request_id", { length: 128 }).notNull(),
+    method: varchar("method", { length: 16 }).notNull(),
+    url: text("url").notNull(),
+    routePath: varchar("route_path", { length: 255 }),
+    statusCode: integer("status_code").notNull(),
+    durationMs: integer("duration_ms").notNull(),
+    ip: varchar("ip", { length: 128 }),
+    userAgent: text("user_agent"),
+    requestHeaders: jsonb("request_headers"),
+    queryParams: jsonb("query_params"),
+    routeParams: jsonb("route_params"),
+    requestBody: jsonb("request_body"),
+    responseBody: jsonb("response_body"),
+    errorName: varchar("error_name", { length: 255 }),
+    errorMessage: text("error_message"),
+    errorStack: text("error_stack"),
+    authenticatedUser: jsonb("authenticated_user"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    requestIdIdx: index("monitoring_requests_request_id_idx").on(table.requestId),
+    statusCodeIdx: index("monitoring_requests_status_code_idx").on(table.statusCode),
+    routePathIdx: index("monitoring_requests_route_path_idx").on(table.routePath),
+    createdAtIdx: index("monitoring_requests_created_at_idx").on(table.createdAt),
+    methodCreatedAtIdx: index("monitoring_requests_method_created_at_idx").on(
+      table.method,
+      table.createdAt,
+    ),
+  }),
+);

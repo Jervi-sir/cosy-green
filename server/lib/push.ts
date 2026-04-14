@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 
 import { db } from "../db";
-import { devicePushTokens } from "../db/schema";
+import { devicePushTokens, users } from "../db/schema";
 
 type PushPayload = {
   title: string;
@@ -58,4 +58,26 @@ export async function sendPushToTokens(tokens: string[], payload: PushPayload) {
 export async function sendPushToUser(userId: string, payload: PushPayload) {
   const tokens = await getUserPushTokens(userId);
   await sendPushToTokens(tokens, payload);
+}
+
+export async function sendPushToUsers(userIds: string[], payload: PushPayload) {
+  if (userIds.length === 0) {
+    return;
+  }
+
+  const tokenSets = await Promise.all(userIds.map((userId) => getUserPushTokens(userId)));
+  const tokens = [...new Set(tokenSets.flat())];
+  await sendPushToTokens(tokens, payload);
+}
+
+export async function sendPushToAllTrucks(payload: PushPayload) {
+  const truckUsers = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.role, "TRUCK"));
+
+  await sendPushToUsers(
+    truckUsers.map((truckUser) => truckUser.id),
+    payload,
+  );
 }

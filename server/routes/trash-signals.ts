@@ -6,6 +6,7 @@ import { db } from "../db";
 import { trashSignals, trucks } from "../db/schema";
 import { requireAuth, requireRole } from "../lib/auth";
 import { nextSignalCode } from "../lib/domain";
+import { sendPushToAllTrucks } from "../lib/push";
 import { serializeSignal } from "../lib/serializers";
 
 const signalPayloadSchema = z.object({
@@ -42,6 +43,17 @@ export const trashSignalRoutes: FastifyPluginAsync = async (app) => {
         status: "WAITING",
       })
       .returning();
+
+    await sendPushToAllTrucks({
+      title: "طلب نفايات جديد",
+      body: `تم إنشاء ${ids.publicId} في ${body.address}`,
+      data: {
+        type: "new_trash_signal",
+        signalId: created.id,
+        publicId: ids.publicId,
+        address: body.address,
+      },
+    });
 
     return { signal: serializeSignal(created, null) };
   });
