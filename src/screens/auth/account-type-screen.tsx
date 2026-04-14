@@ -15,7 +15,7 @@ import {
 export function AccountTypeScreen({
   navigation,
 }: NativeStackScreenProps<RootStackParamList, "AccountType">) {
-  const { state, setVenueType } = useAppFlow();
+  const { state, completeFreePlanSetup, setVenueType } = useAppFlow();
 
   return (
     <ScreenShell scroll withPaddingBottom={false}>
@@ -52,11 +52,13 @@ export function AccountTypeScreen({
             onPress={() =>
               state.subscriptionType === "Paid"
                 ? navigation.navigate("Payment")
-                : navigation.dispatch(
-                    CommonActions.reset({
-                      index: 0,
-                      routes: [{ name: "UserApp" }],
-                    }),
+                : completeFreePlanSetup().then(() =>
+                    navigation.dispatch(
+                      CommonActions.reset({
+                        index: 0,
+                        routes: [{ name: "UserApp" }],
+                      }),
+                    ),
                   )
             }
           />

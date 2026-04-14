@@ -1,5 +1,6 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Pressable, Text, View } from "react-native";
+import QRCode from "react-native-qrcode-svg";
 
 import { RootStackParamList } from "../../navigation/AppNavigator";
 import { useAppFlow } from "../interaction/context";
@@ -12,7 +13,7 @@ export function UserTrashDetailsScreen({
 }: NativeStackScreenProps<RootStackParamList, "UserTrashDetails">) {
   const { state, simulateTruckScan } = useAppFlow();
   const signal = state.signals.find(
-    (entry) => entry.id === route.params.signalId,
+    (entry) => entry.backendId === route.params.signalId,
   );
 
   if (!signal) {
@@ -70,44 +71,23 @@ export function UserTrashDetailsScreen({
                 ? "وصلت الشاحنة. اعرض هذا الرمز ليتم المسح وتأكيد الاستلام."
                 : "أكدت الشاحنة الطلب. احتفظ بهذا الرمز جاهزاً حتى تصل إليك."}
           </Text>
-          <FakeQr value={signal.qrCode} />
+          <View style={styles.qrGrid}>
+            <QRCode value={signal.qrCode} size={176} />
+          </View>
           <Text style={styles.qrCodeText}>{signal.qrCode}</Text>
-          {signal.status !== "Picked" ? (
+          {/* {signal.status !== "Picked" ? (
             <Pressable
               style={styles.primaryButton}
-              onPress={() => {
-                simulateTruckScan(signal.id);
+              onPress={async () => {
+                await simulateTruckScan(signal.backendId);
                 navigation.goBack();
               }}
             >
               <Text style={styles.primaryButtonText}>محاكاة مسح الرمز</Text>
             </Pressable>
-          ) : null}
+          ) : null} */}
         </View>
       ) : null}
     </ScreenShell>
-  );
-}
-
-function FakeQr({ value }: { value: string }) {
-  const outer = value.padEnd(16, "0").slice(0, 16).split("");
-  const inner = value.padEnd(4, "0").slice(0, 4).split("");
-  const cells = outer.flatMap((char, row) =>
-    inner.map((innerChar, column) => ({
-      key: `${char}-${innerChar}-${row}-${column}`,
-      filled:
-        (char.charCodeAt(0) + innerChar.charCodeAt(0) + row + column) % 2 === 0,
-    })),
-  );
-
-  return (
-    <View style={styles.qrGrid}>
-      {cells.map((cell) => (
-        <View
-          key={cell.key}
-          style={[styles.qrCell, cell.filled && styles.qrCellFilled]}
-        />
-      ))}
-    </View>
   );
 }

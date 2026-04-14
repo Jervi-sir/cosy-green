@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Text, Pressable, StyleSheet, View } from "react-native";
+import { Alert, Text, Pressable, StyleSheet, View } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
@@ -17,39 +17,43 @@ export function TruckQrScannerScreen({
   const [locked, setLocked] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const signal = useMemo(
-    () => state.signals.find((entry) => entry.id === route.params.signalId),
-    [route.params.signalId, state.signals],
+    () => {
+      const signalId = route.params?.signalId;
+      return signalId
+        ? state.signals.find((entry) => entry.backendId === signalId)
+        : undefined;
+    },
+    [route.params?.signalId, state.signals],
   );
 
-  const handleCodeScanned = ({ data }: { data: string }) => {
+  const handleCodeScanned = async ({ data }: { data: string }) => {
     if (locked) {
       return;
     }
 
     setLocked(true);
-    const didScan = scanSignalByQrCode(data);
-    if (didScan) {
-      setFeedback("تم مسح رمز QR وتأكيد الالتقاط.");
-      setTimeout(() => navigation.goBack(), 700);
-      return;
-    }
+    Alert.alert("تأكيد الالتقاط", "هل تم أخذ هذه النفايات؟", [
+      {
+        text: "لا",
+        style: "cancel",
+        onPress: () => setLocked(false),
+      },
+      {
+        text: "نعم",
+        onPress: async () => {
+          const didScan = await scanSignalByQrCode(data);
+          if (didScan) {
+            setFeedback("تم مسح رمز QR وتأكيد الالتقاط.");
+            setTimeout(() => navigation.goBack(), 700);
+            return;
+          }
 
-    setFeedback("الرمز غير صالح لهذا الطلب أو أن الشاحنة لم تصل بعد.");
-    setTimeout(() => setLocked(false), 1400);
+          setFeedback("الرمز غير صالح أو أن هذا الطلب غير جاهز للتأكيد حالياً.");
+          setTimeout(() => setLocked(false), 1400);
+        },
+      },
+    ]);
   };
-
-  if (!signal) {
-    return (
-      <ScreenShell>
-        <View style={screenStyles.centerState}>
-          <Text style={screenStyles.stateTitle}>الطلب غير موجود</Text>
-          <Pressable style={screenStyles.actionButton} onPress={() => navigation.goBack()}>
-            <Text style={screenStyles.actionButtonText}>رجوع</Text>
-          </Pressable>
-        </View>
-      </ScreenShell>
-    );
-  }
 
   if (!permission) {
     return <ScreenShell><View style={screenStyles.centerState} /></ScreenShell>;
@@ -87,7 +91,11 @@ export function TruckQrScannerScreen({
           </Pressable>
           <View style={screenStyles.headerCopy}>
             <Text style={screenStyles.headerTitle}>مسح QR للشاحنة</Text>
-            <Text style={screenStyles.headerSubtitle}>{signal.id} - {signal.address}</Text>
+            <Text style={screenStyles.headerSubtitle}>
+              {signal
+                ? `${signal.id} - ${signal.address}`
+                : "امسح أي رمز QR صالح لتأكيد الالتقاط"}
+            </Text>
           </View>
         </View>
 
@@ -96,7 +104,7 @@ export function TruckQrScannerScreen({
         <View style={screenStyles.footerCard}>
           <Text style={screenStyles.footerTitle}>وجّه الكاميرا نحو رمز العميل</Text>
           <Text style={screenStyles.footerText}>
-            يعمل هذا الماسح فقط عندما تكون حالة الطلب "وصل".
+            يمكن لهذا الماسح قراءة أي رمز QR صالح، لكن التأكيد ينجح فقط إذا كانت حالة الطلب "وصل".
           </Text>
           {feedback ? <Text style={screenStyles.feedbackText}>{feedback}</Text> : null}
         </View>

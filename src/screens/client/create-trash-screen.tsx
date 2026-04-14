@@ -155,8 +155,7 @@ export function CreateTrashScreen({
                   note,
                   address,
                   coordinate,
-                });
-                navigation.goBack();
+                }).then(() => navigation.goBack());
               }}
             />
           </View>

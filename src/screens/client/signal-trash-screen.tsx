@@ -1,21 +1,97 @@
 import { Ionicons } from "@expo/vector-icons";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
-import { useNavigation } from "@react-navigation/native";
-import { Text, Pressable, View } from "react-native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useCallback, useState } from "react";
+import { ActivityIndicator, Text, Pressable, View } from "react-native";
 
 import { UserTabParamList } from "../../navigation/AppNavigator";
-import { useAppFlow } from "../interaction/context";
+import { apiRequest } from "@/lib/api";
+import { colors } from "@/theme";
 import { styles } from "../interaction/styles";
+import { type TrashSignal } from "../interaction/types";
 import { HeroHeader, ScreenShell } from "../interaction/ui";
 
 type Props = BottomTabScreenProps<UserTabParamList, "Signal">;
 
+type ServerSignal = {
+  id: string;
+  publicId: string;
+  wasteTypes: string[];
+  note: string;
+  address: string;
+  coordinate: {
+    latitude: number;
+    longitude: number;
+  };
+  status: "WAITING" | "CONFIRMED" | "ARRIVING" | "ARRIVED" | "PICKED" | "CANCELLED";
+  qrCode: string;
+  qrUnlocked: boolean;
+  acceptedByTruck: boolean;
+  acceptedAt?: string | null;
+  scannedAt?: string | null;
+  createdAt: string;
+};
+
+function mapStatus(status: ServerSignal["status"]): TrashSignal["status"] {
+  if (status === "ARRIVED") return "Arrived";
+  if (status === "PICKED") return "Picked";
+  if (status === "CANCELLED") return "Cancelled";
+  if (status === "CONFIRMED" || status === "ARRIVING") return "On the way";
+  return "Waiting";
+}
+
+function mapSignal(signal: ServerSignal): TrashSignal {
+  return {
+    backendId: signal.id,
+    id: signal.publicId,
+    wasteTypes: signal.wasteTypes as TrashSignal["wasteTypes"],
+    note: signal.note,
+    address: signal.address,
+    coordinate: signal.coordinate,
+    status: mapStatus(signal.status),
+    createdAt: new Date(signal.createdAt).toLocaleString("ar-DZ", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }),
+    qrCode: signal.qrCode,
+    qrUnlocked: signal.qrUnlocked,
+    acceptedByTruck: signal.acceptedByTruck,
+    acceptedAt: signal.acceptedAt ?? undefined,
+    scannedAt: signal.scannedAt ?? undefined,
+  };
+}
+
 export function SignalTrashScreen({ navigation }: Props) {
   const rootNavigation = useNavigation<any>();
-  const { state } = useAppFlow();
+  const [signals, setSignals] = useState<TrashSignal[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadSignals = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await apiRequest<{ items: ServerSignal[] }>(
+        "/trash-signals?mine=true",
+      );
+      setSignals(response.items.map(mapSignal));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadSignals();
+    }, [loadSignals]),
+  );
 
   return (
-    <ScreenShell scroll>
+    <ScreenShell
+      scroll
+      refreshing={loading}
+      onRefresh={() => {
+        loadSignals();
+      }}
+    >
       <HeroHeader
         title="النفايات المُبلغ عنها"
         subtitle="شاهد جميع طلبات النفايات وحالاتها، ثم أضف طلباً جديداً عند الحاجة."
@@ -33,20 +109,24 @@ export function SignalTrashScreen({ navigation }: Props) {
       </Pressable>
 
       <View style={styles.listColumn}>
-        {state.signals.length === 0 ? (
+        {loading ? (
+          <View style={styles.emptyCard}>
+            <ActivityIndicator color={colors.primaryDeep} />
+          </View>
+        ) : signals.length === 0 ? (
           <View style={styles.emptyCard}>
             <Text style={styles.emptyText}>
               لا توجد نفايات مُبلغ عنها بعد. اضغط على إضافة لإنشاء أول طلب.
             </Text>
           </View>
         ) : (
-          state.signals.map((signal) => (
+          signals.map((signal) => (
             <Pressable
               key={signal.id}
               style={styles.signalCard}
               onPress={() =>
                 rootNavigation.navigate("UserTrashDetails", {
-                  signalId: signal.id,
+                  signalId: signal.backendId,
                 })
               }
             >

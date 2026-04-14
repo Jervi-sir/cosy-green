@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors } from "../../theme";
@@ -11,11 +11,15 @@ export function ScreenShell({
   scroll = false,
   includeTopSafeArea = true,
   withPaddingBottom = true,
+  refreshing = false,
+  onRefresh,
 }: {
   children: ReactNode;
   scroll?: boolean;
   includeTopSafeArea?: boolean;
   withPaddingBottom?: boolean;
+  refreshing?: boolean;
+  onRefresh?: () => void;
 }) {
   if (scroll) {
     return (
@@ -28,6 +32,16 @@ export function ScreenShell({
             styles.scrollContent,
             withPaddingBottom && { paddingBottom: 120 },
           ]}
+          refreshControl={
+            onRefresh ? (
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor={colors.primaryDeep}
+                colors={[colors.primaryDeep]}
+              />
+            ) : undefined
+          }
         >
           {children}
         </ScrollView>

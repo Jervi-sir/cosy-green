@@ -190,11 +190,9 @@ export const styles = StyleSheet.create({
     color: colors.muted,
   },
   qrGrid: {
-    width: 180,
-    height: 180,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    borderWidth: 10,
+    borderWidth: 7,
     borderColor: colors.ink,
     backgroundColor: colors.white,
   },

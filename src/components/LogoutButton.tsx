@@ -18,8 +18,8 @@ export const LogoutButton = () => {
         height: 48,
         justifyContent: "center",
       }}
-      onPress={() => {
-        resetApp();
+      onPress={async () => {
+        await resetApp();
         navigation.dispatch(
           CommonActions.reset({
             index: 0,

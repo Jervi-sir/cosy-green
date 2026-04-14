@@ -12,6 +12,8 @@ import { DriverConfirmedScreen } from "@/screens/truck/driver-confirmed-screen";
 import { TruckProfileScreen } from "@/screens/truck/truck-profile-screen";
 import { LoadingScreen } from "@/screens/auth/loading-screen";
 import { LoginScreen } from "@/screens/auth/login-screen";
+import { ModeSelectScreen } from "@/screens/auth/mode-select-screen";
+import { RegisterScreen } from "@/screens/auth/register-screen";
 import { SubscriptionScreen } from "@/screens/common/subscription-screen";
 import { AccountTypeScreen } from "@/screens/auth/account-type-screen";
 import { PaymentScreen } from "@/screens/common/payment-screen";
@@ -32,7 +34,7 @@ export type RootStackParamList = {
   RequestDetails: undefined;
   UserTrashDetails: { signalId: string };
   TruckTrashDetails: { signalId: string };
-  TruckQrScanner: { signalId: string };
+  TruckQrScanner: { signalId?: string } | undefined;
   Welcome: undefined;
   Register: undefined;
   ModeSelect: undefined;
@@ -190,7 +192,9 @@ export function AppNavigator() {
           screenOptions={{ headerShown: false }}
         >
           <Stack.Screen name="Loading" component={LoadingScreen} />
+          <Stack.Screen name="ModeSelect" component={ModeSelectScreen} />
           <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen name="Subscription" component={SubscriptionScreen} />
           <Stack.Screen name="AccountType" component={AccountTypeScreen} />
           <Stack.Screen name="Payment" component={PaymentScreen} />
@@ -210,8 +214,6 @@ export function AppNavigator() {
             component={TruckQrScannerScreen}
           />
           {/* <Stack.Screen name="Welcome" component={LegacyScreen} /> */}
-          {/* <Stack.Screen name="Register" component={LegacyScreen} /> */}
-          {/* <Stack.Screen name="ModeSelect" component={LegacyScreen} /> */}
           <Stack.Screen name="UserFlow" component={UserTabs} />
           <Stack.Screen name="MainTabs" component={UserTabs} />
           <Stack.Screen name="TruckFlow" component={TruckTabs} />

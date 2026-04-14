@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Text, Pressable, View } from "react-native";
 
@@ -7,13 +8,21 @@ import { HeroHeader, ScreenShell } from "../interaction/ui";
 
 export function DriverNewTrashScreen() {
   const navigation = useNavigation<any>();
-  const { state, resetApp, selectTruckSignal } = useAppFlow();
+  const { state, refreshData, selectTruckSignal } = useAppFlow();
+  const [refreshing, setRefreshing] = useState(false);
   const newSignals = state.signals.filter(
     (signal) => !signal.acceptedByTruck && signal.status !== "Picked",
   );
 
   return (
-    <ScreenShell scroll>
+    <ScreenShell
+      scroll
+      refreshing={refreshing}
+      onRefresh={() => {
+        setRefreshing(true);
+        refreshData().finally(() => setRefreshing(false));
+      }}
+    >
       <HeroHeader
         title="نفايات جديدة"
         subtitle="طلبات النفايات الواردة بانتظار مراجعة الشاحنة وتأكيدها."
@@ -32,9 +41,9 @@ export function DriverNewTrashScreen() {
               key={signal.id}
               style={styles.signalCard}
               onPress={() => {
-                selectTruckSignal(signal.id);
+                selectTruckSignal(signal.backendId);
                 navigation.navigate("TruckTrashDetails", {
-                  signalId: signal.id,
+                  signalId: signal.backendId,
                 });
               }}
             >

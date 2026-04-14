@@ -139,21 +139,23 @@ export function TruckLocationScreen() {
           </Marker>
         </MapView>
 
-        <View style={screenStyles.moveControls}>
-          <View style={screenStyles.moveButtonWrap}>
-            <Pressable
-              style={screenStyles.secondaryMoveButton}
-              onPress={moveTruckBack}
-            >
-              <Text style={screenStyles.secondaryMoveButtonText}>
-                إرجاع الشاحنة نقطة
-              </Text>
-            </Pressable>
+        {isTruckMode ? (
+          <View style={screenStyles.moveControls}>
+            <View style={screenStyles.moveButtonWrap}>
+              <Pressable
+                style={screenStyles.secondaryMoveButton}
+                onPress={moveTruckBack}
+              >
+                <Text style={screenStyles.secondaryMoveButtonText}>
+                  إرجاع الشاحنة نقطة
+                </Text>
+              </Pressable>
+            </View>
+            <View style={screenStyles.moveButtonWrap}>
+              <PrimaryButton label="تحريك الشاحنة أقرب" onPress={moveTruck} />
+            </View>
           </View>
-          <View style={screenStyles.moveButtonWrap}>
-            <PrimaryButton label="تحريك الشاحنة أقرب" onPress={moveTruck} />
-          </View>
-        </View>
+        ) : null}
 
         <View style={screenStyles.bottomOverlay}>
           {isTruckMode ? (

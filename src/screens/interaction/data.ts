@@ -72,6 +72,7 @@ export const initialState: RequestState = {
   venueType: 'House',
   signals: [
     {
+      backendId: 'demo-signal',
       id: 'SG-001',
       wasteTypes: ['بلاستيك'],
       note: 'الأكياس جاهزة عند المدخل.',
@@ -80,11 +81,12 @@ export const initialState: RequestState = {
       status: 'On the way',
       createdAt: 'اليوم، 10:05 صباحاً',
       qrCode: 'SG0012048',
+      qrUnlocked: true,
       acceptedByTruck: true,
       acceptedAt: 'اليوم، 10:10 صباحاً',
     },
   ],
-  selectedTruckSignalId: 'SG-001',
+  selectedTruckSignalId: 'demo-signal',
   wasteTypes: ['بلاستيك'],
   note: 'الأكياس جاهزة عند المدخل.',
   address: 'بالقرب من مدخل الخدمة، وهران',
@@ -93,12 +95,15 @@ export const initialState: RequestState = {
   truckEta: '11:00 صباحاً',
   points: 30,
   truckProfile: {
+    id: 'demo-truck',
     name: 'شاحنة وهران',
     plateNumber: '21345-118-16',
     zone: 'وهران - القطاع الغربي',
     pickedCount: 8,
     completedTrips: 3,
   },
+  isBootstrapping: true,
+  isAuthenticated: false,
 };
 
 export const etaMap = [

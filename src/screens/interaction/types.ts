@@ -1,7 +1,8 @@
-export type WasteType = 'بلاستيك' | 'خبز' | 'معدن';
-export type VenueType = 'House' | 'Restaurant';
-export type SubscriptionType = 'Free' | 'Paid';
-export type AppRole = 'User' | 'Truck';
+export type WasteType = "بلاستيك" | "خبز" | "معدن";
+export type VenueType = "House" | "Restaurant";
+export type SubscriptionType = "Free" | "Paid";
+export type AppRole = "User" | "Truck";
+export type TrashStatus = "Waiting" | "On the way" | "Arrived" | "Picked" | "Cancelled";
 
 export type Coordinate = {
   latitude: number;
@@ -13,9 +14,15 @@ export type TruckStop = Coordinate & {
   label: string;
 };
 
-export type TrashStatus = 'Waiting' | 'On the way' | 'Arrived' | 'Picked';
+export type TruckSummary = {
+  id: string;
+  name: string;
+  plateNumber: string;
+  zone: string;
+};
 
 export type TrashSignal = {
+  backendId: string;
   id: string;
   wasteTypes: WasteType[];
   note: string;
@@ -24,12 +31,15 @@ export type TrashSignal = {
   status: TrashStatus;
   createdAt: string;
   qrCode: string;
+  qrUnlocked?: boolean;
   scannedAt?: string;
   acceptedByTruck?: boolean;
   acceptedAt?: string;
+  truck?: TruckSummary | null;
 };
 
 export type TruckProfile = {
+  id?: string;
   name: string;
   plateNumber: string;
   zone: string;
@@ -51,22 +61,45 @@ export type RequestState = {
   truckEta: string;
   points: number;
   truckProfile: TruckProfile;
+  isBootstrapping: boolean;
+  isAuthenticated: boolean;
+  userId?: string;
+  fullName?: string;
+  email?: string;
 };
 
 export type AppFlowContextValue = {
   state: RequestState;
+  bootstrap: () => Promise<"ModeSelect" | "UserApp" | "TruckApp">;
+  login: (email: string, password: string) => Promise<"Subscription" | "UserApp" | "TruckApp">;
+  register: (payload: {
+    fullName: string;
+    email: string;
+    password: string;
+    truckName?: string;
+    plateNumber?: string;
+    zone?: string;
+  }) => Promise<"Subscription" | "UserApp" | "TruckApp">;
   setAppRole: (value: AppRole) => void;
   setSubscriptionType: (value: SubscriptionType) => void;
   setVenueType: (value: VenueType) => void;
-  submitSignal: (payload: { wasteTypes: WasteType[]; note: string; address: string; coordinate: Coordinate }) => void;
+  completeFreePlanSetup: () => Promise<void>;
+  completePaidPlanSetup: () => Promise<void>;
+  submitSignal: (payload: {
+    wasteTypes: WasteType[];
+    note: string;
+    address: string;
+    coordinate: Coordinate;
+  }) => Promise<void>;
   getCurrentSignal: () => TrashSignal | undefined;
   getSelectedTruckSignal: () => TrashSignal | undefined;
-  selectTruckSignal: (id: string) => void;
-  confirmTruckSignal: (id: string) => void;
-  moveTruck: () => void;
-  moveTruckBack: () => void;
-  scanCurrentSignal: () => void;
-  simulateTruckScan: (id: string) => void;
-  scanSignalByQrCode: (qrCode: string) => boolean;
-  resetApp: () => void;
+  selectTruckSignal: (backendId: string) => void;
+  confirmTruckSignal: (backendId: string) => Promise<void>;
+  moveTruck: () => Promise<void>;
+  moveTruckBack: () => Promise<void>;
+  scanCurrentSignal: () => Promise<void>;
+  simulateTruckScan: (backendId: string) => Promise<void>;
+  scanSignalByQrCode: (qrCode: string) => Promise<boolean>;
+  refreshData: () => Promise<void>;
+  resetApp: () => Promise<void>;
 };

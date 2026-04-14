@@ -5,14 +5,29 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { type RootStackParamList } from "../../navigation/AppNavigator";
 import { colors } from "../../theme";
+import { useAppFlow } from "../interaction/context";
 import { styles } from "../interaction/styles";
 
 export function LoadingScreen({
   navigation,
 }: NativeStackScreenProps<RootStackParamList, "Loading">) {
+  const { bootstrap } = useAppFlow();
+
   useEffect(() => {
-    const timer = setTimeout(() => navigation.replace("Login"), 1400);
-    return () => clearTimeout(timer);
+    let cancelled = false;
+
+    const run = async () => {
+      const result = await bootstrap();
+      if (!cancelled && result) {
+        navigation.replace(result);
+      }
+    };
+
+    run().catch(() => navigation.replace("Login"));
+
+    return () => {
+      cancelled = true;
+    };
   }, [navigation]);
 
   return (

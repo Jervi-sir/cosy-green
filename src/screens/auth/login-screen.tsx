@@ -1,30 +1,37 @@
 import { useState } from "react";
-import { Text, TextInput, View } from "react-native";
+import { CommonActions } from "@react-navigation/native";
+import { Alert, Text, TextInput, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { type RootStackParamList } from "../../navigation/AppNavigator";
 import { useAppFlow } from "../interaction/context";
 import { styles } from "../interaction/styles";
-import {
-  ChoiceCard,
-  HeroHeader,
-  PrimaryButton,
-  ScreenShell,
-} from "../interaction/ui";
+import { HeroHeader, PrimaryButton, ScreenShell } from "../interaction/ui";
 
 export function LoginScreen({
   navigation,
 }: NativeStackScreenProps<RootStackParamList, "Login">) {
-  const { state, setAppRole } = useAppFlow();
-  const [email, setEmail] = useState("user@cozygreen.app");
+  const { state, login } = useAppFlow();
+  const [email, setEmail] = useState(
+    state.appRole === "Truck" ? "truck@cozygreen.app" : "user@cozygreen.app",
+  );
   const [password, setPassword] = useState("12345678");
 
   return (
     <ScreenShell scroll>
       <HeroHeader
-        title="تسجيل الدخول"
-        subtitle="اختر ما إذا كان هذا الدخول سيفتح تطبيق المستخدم أو تطبيق الشاحنة."
+        title={state.appRole === "Truck" ? "دخول الشاحنة" : "دخول المستخدم"}
+        subtitle={
+          state.appRole === "Truck"
+            ? "سجّل الدخول للوصول إلى الطلبات والمسار وماسح QR."
+            : "سجّل الدخول لإدارة طلبات النفايات وتتبع الشاحنة والنقاط."
+        }
+        backLabel="رجوع"
+        onBackPress={() =>
+          navigation.reset({ index: 0, routes: [{ name: "ModeSelect" }] })
+        }
       />
+
       <View style={styles.card}>
         <Text style={styles.label}>البريد الإلكتروني</Text>
         <TextInput
@@ -32,6 +39,7 @@ export function LoginScreen({
           onChangeText={setEmail}
           style={styles.input}
           placeholder="name@example.com"
+          autoCapitalize="none"
         />
         <Text style={styles.label}>كلمة المرور</Text>
         <TextInput
@@ -43,35 +51,40 @@ export function LoginScreen({
         />
       </View>
 
-      <View style={styles.splitColumn}>
-        <ChoiceCard
-          title="تطبيق المستخدم"
-          subtitle="مسار المواطن مع الاشتراك، نوع الحساب، إرسال إشارات النفايات، تتبع الشاحنات والنقاط."
-          icon="person-outline"
-          selected={state.appRole === "User"}
-          onPress={() => setAppRole("User")}
-        />
-        <ChoiceCard
-          title="تطبيق الشاحنة"
-          subtitle="مسار السائق مع المهام المعينة، تقدم المسار وتأكيد المسح عبر رمز QR."
-          icon="bus-outline"
-          selected={state.appRole === "Truck"}
-          onPress={() => setAppRole("Truck")}
-        />
-      </View>
-
       <PrimaryButton
         label={
-          state.appRole === "Truck"
-            ? "افتح تطبيق الشاحنة"
-            : "متابعة إعداد المستخدم"
+          state.appRole === "Truck" ? "افتح تطبيق الشاحنة" : "تسجيل الدخول"
         }
-        onPress={() =>
-          navigation.navigate(
-            state.appRole === "Truck" ? "TruckApp" : "Subscription",
-          )
-        }
+        onPress={async () => {
+          try {
+            const destination = await login(email, password);
+            if (destination === "TruckApp" || destination === "UserApp") {
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{ name: destination }],
+                }),
+              );
+              return;
+            }
+
+            navigation.navigate(destination);
+          } catch (error) {
+            Alert.alert(
+              "تعذر تسجيل الدخول",
+              error instanceof Error ? error.message : "حدث خطأ غير متوقع",
+            );
+          }
+        }}
       />
+
+      <View style={styles.card}>
+        <Text style={styles.signalText}>ليس لديك حساب بعد؟</Text>
+        <PrimaryButton
+          label="إنشاء حساب"
+          onPress={() => navigation.navigate("Register")}
+        />
+      </View>
     </ScreenShell>
   );
 }

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Text, Pressable, View } from "react-native";
 
@@ -7,31 +8,26 @@ import { HeroHeader, ScreenShell } from "../interaction/ui";
 
 export function DriverConfirmedScreen() {
   const navigation = useNavigation<any>();
-  const { state, resetApp, selectTruckSignal } = useAppFlow();
+  const { state, refreshData, selectTruckSignal } = useAppFlow();
+  const [refreshing, setRefreshing] = useState(false);
   const confirmedSignals = state.signals.filter(
     (signal) => signal.acceptedByTruck || signal.status === "Picked",
   );
 
   return (
-    <ScreenShell scroll>
+    <ScreenShell
+      scroll
+      refreshing={refreshing}
+      onRefresh={() => {
+        setRefreshing(true);
+        refreshData().finally(() => setRefreshing(false));
+      }}
+    >
       <HeroHeader
         title="النفايات المؤكدة"
         subtitle="تم تأكيد استلام النفايات من قبل هذه الشاحنة."
         actionIcon="camera-outline"
-        onActionPress={() => {
-          const arrivedSignal = confirmedSignals.find(
-            (signal) => signal.status === "Arrived",
-          );
-
-          if (!arrivedSignal) {
-            return;
-          }
-
-          selectTruckSignal(arrivedSignal.id);
-          navigation.navigate("TruckQrScanner", {
-            signalId: arrivedSignal.id,
-          });
-        }}
+        onActionPress={() => navigation.navigate("TruckQrScanner")}
       />
 
       <View style={styles.listColumn}>
@@ -47,10 +43,13 @@ export function DriverConfirmedScreen() {
               key={signal.id}
               style={styles.signalCard}
               onPress={() => {
-                selectTruckSignal(signal.id);
-                navigation.navigate("TruckTrashDetails", {
-                  signalId: signal.id,
-                });
+                selectTruckSignal(signal.backendId);
+                navigation.navigate(
+                  "TruckTrashDetails",
+                  {
+                    signalId: signal.backendId,
+                  },
+                );
               }}
             >
               <View style={styles.signalTopRow}>
@@ -85,12 +84,7 @@ export function DriverConfirmedScreen() {
               {signal.status === "Arrived" ? (
                 <Pressable
                   style={[styles.primaryButton, { marginTop: 8 }]}
-                  onPress={() => {
-                    selectTruckSignal(signal.id);
-                    navigation.navigate("TruckQrScanner", {
-                      signalId: signal.id,
-                    });
-                  }}
+                  onPress={() => navigation.navigate("TruckQrScanner")}
                 >
                   <Text style={styles.primaryButtonText}>
                     فتح الكاميرا لمسح QR

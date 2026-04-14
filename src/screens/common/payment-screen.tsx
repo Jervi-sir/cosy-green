@@ -15,7 +15,7 @@ import {
 export function PaymentScreen({
   navigation,
 }: NativeStackScreenProps<RootStackParamList, "Payment">) {
-  const { state } = useAppFlow();
+  const { state, completePaidPlanSetup } = useAppFlow();
 
   return (
     <ScreenShell scroll>
@@ -45,11 +45,13 @@ export function PaymentScreen({
         <PrimaryButton
           label="ادفع وادخل التطبيق"
           onPress={() =>
-            navigation.dispatch(
-              CommonActions.reset({
-                index: 0,
-                routes: [{ name: "UserApp" }],
-              }),
+            completePaidPlanSetup().then(() =>
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{ name: "UserApp" }],
+                }),
+              ),
             )
           }
         />

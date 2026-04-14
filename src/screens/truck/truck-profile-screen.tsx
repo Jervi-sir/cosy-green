@@ -1,14 +1,18 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { useState } from "react";
 import { Text, View } from "react-native";
 
 import { LogoutButton } from "@/components/LogoutButton";
 import { colors } from "@/theme";
 import { useAppFlow } from "../interaction/context";
 import { styles } from "../interaction/styles";
-import { DetailRow, HeroHeader, ScreenShell } from "../interaction/ui";
+import { DetailRow, HeroHeader, PrimaryButton, ScreenShell } from "../interaction/ui";
 
 export function TruckProfileScreen() {
-  const { state } = useAppFlow();
+  const navigation = useNavigation<any>();
+  const { state, refreshData } = useAppFlow();
+  const [refreshing, setRefreshing] = useState(false);
   const waitingCount = state.signals.filter(
     (signal) => signal.status === "Waiting",
   ).length;
@@ -23,7 +27,14 @@ export function TruckProfileScreen() {
   ).length;
 
   return (
-    <ScreenShell scroll>
+    <ScreenShell
+      scroll
+      refreshing={refreshing}
+      onRefresh={() => {
+        setRefreshing(true);
+        refreshData().finally(() => setRefreshing(false));
+      }}
+    >
       <HeroHeader
         title="ملف الشاحنة"
         subtitle="إحصائيات سريعة عن الأداء وعدد عمليات الاستلام الحالية."
@@ -79,6 +90,12 @@ export function TruckProfileScreen() {
           <DetailRow
             label="عدد الطلبات الحالية"
             value={`${state.signals.length} طلبات`}
+          />
+        </View>
+        <View style={{ marginTop: 16 }}>
+          <PrimaryButton
+            label="فتح ماسح QR"
+            onPress={() => navigation.navigate("TruckQrScanner")}
           />
         </View>
       </View>

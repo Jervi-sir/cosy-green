@@ -20,10 +20,10 @@ export function DriverTrashDetailsScreen({
   navigation,
   route,
 }: NativeStackScreenProps<RootStackParamList, "TruckTrashDetails">) {
-  const { state, confirmTruckSignal, selectTruckSignal, scanCurrentSignal } =
+  const { state, confirmTruckSignal, scanSignalByQrCode, simulateTruckScan } =
     useAppFlow();
   const signal = state.signals.find(
-    (entry) => entry.id === route.params.signalId,
+    (entry) => entry.backendId === route.params.signalId,
   );
   const activeTruckCoordinate =
     truckRoute[Math.min(state.truckStep, truckRoute.length - 1)];
@@ -73,8 +73,7 @@ export function DriverTrashDetailsScreen({
           <PrimaryButton
             label="تأكيد أن الشاحنة ستلتقط الطلب"
             onPress={() => {
-              confirmTruckSignal(signal.id);
-              navigation.goBack();
+              confirmTruckSignal(signal.backendId).then(() => navigation.goBack());
             }}
           />
         ) : null}
@@ -82,9 +81,15 @@ export function DriverTrashDetailsScreen({
           <PrimaryButton
             label="مسح رمز QR وتأكيد الالتقاط"
             onPress={() => {
-              selectTruckSignal(signal.id);
-              scanCurrentSignal();
-              navigation.goBack();
+              scanSignalByQrCode(signal.qrCode).then(() => navigation.goBack());
+            }}
+          />
+        ) : null}
+        {signal.acceptedByTruck && signal.status !== "Picked" ? (
+          <PrimaryButton
+            label="محاكاة التحديد كمستلم بواسطة الشاحنة"
+            onPress={() => {
+              simulateTruckScan(signal.backendId).then(() => navigation.goBack());
             }}
           />
         ) : null}
