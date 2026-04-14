@@ -7,11 +7,12 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "server:dev": "tsx watch --tsconfig tsconfig.server.json server/index.ts",
-    "server:start": "tsx --tsconfig tsconfig.server.json server/index.ts",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "server:dev": "npm --prefix ./server run dev",
+    "server:start": "npm --prefix ./server run start",
+    "server:typecheck": "npm --prefix ./server run typecheck",
+    "db:generate": "npm --prefix ./server run db:generate",
+    "db:migrate": "npm --prefix ./server run db:migrate",
+    "db:studio": "npm --prefix ./server run db:studio"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",
