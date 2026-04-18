@@ -17,7 +17,10 @@ export function LoadingScreen({
     let cancelled = false;
 
     const run = async () => {
-      const result = await bootstrap();
+      const [result] = await Promise.all([
+        bootstrap(),
+        new Promise((resolve) => setTimeout(resolve, 1000)),
+      ]);
       if (!cancelled && result) {
         navigation.replace(result);
       }
